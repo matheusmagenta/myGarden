@@ -1,3 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: content-box;
+}
+
+body {
+  display: flex;
+  font-family: sans-serif;
+  justify-content: center;
+  align-items: center;
+}
+
 .plant {
+  border: 1px solid black;
+}
+
+.weather {
   border: 1px solid black;
 }
