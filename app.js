@@ -2,10 +2,11 @@
 // http://127.0.0.1:5500/my-projects/myGarden/index.html?
 
 class Plant {
-  constructor(plantName, sowDay, harvestDay) {
+  constructor(plantName, sowDay, harvestDay, plantId) {
     this.plantName = plantName;
     this.sowDay = sowDay;
     this.harvestDay = harvestDay;
+    this.plantId = plantId;
   }
 }
 
@@ -15,6 +16,8 @@ class Weather {
     this.weatherForecast = weatherForecast;
   }
 }
+
+let gardenStorage = [];
 
 // selecting elements
 const addButton = document.querySelector(".form-submit");
@@ -32,21 +35,26 @@ const addPlant = function (e) {
   const plant = document.createElement("div");
   plant.classList.add("plant");
   plant.id = `${plantNameInput.value}`;
-  //console.log("plantNameInput: ", plantNameInput.value);
+  //console.log("{plantSowDateInput: ", {plantSowDateInput.value);
   plant.innerHTML = `<p>${plantNameInput.value}</p>
   <p>Sow Date: ${plantSowDateInput.value}</p>
   <p>Harvest Date: ${plantHarvestDateInput.value}</p>
-  <button class="edit-plant">edit</button>
-  <button class="remove-plant">remove</button>
+  <button class="watered-plant">watered today?</button>
+  <i class="far fa-edit edit-plant"></i><i class="far fa-trash-alt remove-plant"></i>
   `;
   plants.appendChild(plant);
 
-  let plantTest = new Plant(
-    plantNameInput.value,
-    plantSowDateInput.value,
-    plantHarvestDateInput.value
+  gardenStorage.push(
+    new Plant(
+      plantNameInput.value,
+      plantSowDateInput.value,
+      plantHarvestDateInput.value,
+      //TODO: improve ID setter
+      gardenStorage.length + 1
+    )
   );
-  console.log("plantTest: ", plantTest);
+  console.log("gardenStorage: ", gardenStorage);
+  // console.log("plantTest: ", plantTest);
 
   plantNameInput.value = "";
   plantSowDateInput.value = "";
@@ -81,11 +89,11 @@ const loadWeatherForecast = async function () {
     result = result.dt_txt.includes("12:00:00");
     return result;
   });
-  console.log(dataResultsMidday);
+  //console.log(dataResultsMidday);
   dataResultsMidday.forEach((result) => {
-    console.log(
+    /* console.log(
       `on ${result.dt_txt}, the temperature will be ${result.main.temp}ºC and ${result.weather[0].description}`
-    );
+    ); */
   });
 };
 loadWeatherForecast();
@@ -95,9 +103,38 @@ const loadWeatherToday = async function () {
     `https://api.openweathermap.org/data/2.5/weather?q=London&units=metric&appid=${apiKey}`
   );
   let dataResult = await response.json();
-  console.log(dataResult);
+  //console.log(dataResult);
   weatherToday.innerText = `${Math.round(dataResult.main.temp)}ºC ${
     dataResult.weather[0].main
   }`;
 };
 loadWeatherToday();
+
+// localStorage CRUD
+class LocalStorage {
+  // create plants in localStorage
+  static insertPlants() {
+    gardenStorage.forEach(function (plant, plantId) {
+      localStorage.setItem(plant.plantId, JSON.stringify(plant));
+    });
+  }
+
+  // retrieve plants from localStorage
+  static getPlants() {
+    gardenStorage = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      gardenStorage.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+    }
+    console.log(gardenStorage);
+  }
+
+  // remove plants from localStorage
+  static removePlants(id) {
+    localStorage.removeItem(id);
+  }
+
+  // update plants from localStorage
+  static changePlants(plant, id) {
+    localStorage.setItem(id, JSON.stringify(plant));
+  }
+}
