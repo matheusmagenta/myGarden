@@ -6,7 +6,6 @@ class Plant {
     this.plantName = plantName;
     this.sowDay = sowDay;
     this.harvestDay = harvestDay;
-    this.plantId = plantId;
   }
 }
 
@@ -17,7 +16,10 @@ class Weather {
   }
 }
 
-let gardenStorage = [];
+const state = {
+  currentPlant: {},
+  gardenStorage: [],
+};
 
 // selecting elements
 const addButton = document.querySelector(".form-submit");
@@ -27,15 +29,13 @@ let plantSowDateInput = document.querySelector("#plant-sow-date");
 let plantHarvestDateInput = document.querySelector("#plant-harvest-date");
 const weatherToday = document.querySelector(".weather-today");
 
-// markup plant
-
 // functions
+// adding plant to storage
 const addPlant = function (e) {
   e.preventDefault();
   const plant = document.createElement("div");
   plant.classList.add("plant");
   plant.id = `${plantNameInput.value}`;
-  //console.log("{plantSowDateInput: ", {plantSowDateInput.value);
   plant.innerHTML = `<p>${plantNameInput.value}</p>
   <p>Sow Date: ${plantSowDateInput.value}</p>
   <p>Harvest Date: ${plantHarvestDateInput.value}</p>
@@ -44,18 +44,22 @@ const addPlant = function (e) {
   `;
   plants.appendChild(plant);
 
-  gardenStorage.push(
-    new Plant(
-      plantNameInput.value,
-      plantSowDateInput.value,
-      plantHarvestDateInput.value,
-      //TODO: improve ID setter
-      gardenStorage.length + 1
-    )
+  state.currentPlant = new Plant(
+    plantNameInput.value,
+    plantSowDateInput.value,
+    plantHarvestDateInput.value
   );
-  console.log("gardenStorage: ", gardenStorage);
+
+  state.gardenStorage.push(state.currentPlant);
+  //console.log("state.gardenStorage: ", state.gardenStorage);
+  console.log("state: ", state);
   // console.log("plantTest: ", plantTest);
 
+  // adding plants to localStorage
+  LocalStorage.insertPlants();
+
+  // TODO: create a function for this funcionality
+  // cleaning form fields
   plantNameInput.value = "";
   plantSowDateInput.value = "";
   plantHarvestDateInput.value = "";
@@ -66,12 +70,26 @@ const removePlant = function (element) {
 };
 
 // event listeners
-// adding plant
+// adding plant to UI and localStorage
 addButton.addEventListener("click", addPlant);
-// removing plant
+
+// removing plant from UI, state and localStorage
 window.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove-plant")) {
+    // removing from UI
     removePlant(e.target.parentElement);
+
+    // removing from localStorage
+    LocalStorage.removePlants(e.target.parentElement.id);
+
+    // removing from state
+    //state.gardenStorage.
+    state.gardenStorage.forEach((plant, index) => {
+      if (plant.plantName == e.target.parentElement.id) {
+        state.gardenStorage.splice(index, 1);
+      }
+    });
+    console.log("state.gardenStorage after removing:", state.gardenStorage);
   }
 });
 
@@ -104,7 +122,7 @@ const loadWeatherToday = async function () {
   );
   let dataResult = await response.json();
   //console.log(dataResult);
-  weatherToday.innerText = `${Math.round(dataResult.main.temp)}ºC ${
+  weatherToday.innerText = `today ${Math.round(dataResult.main.temp)}ºC ${
     dataResult.weather[0].main
   }`;
 };
@@ -114,18 +132,20 @@ loadWeatherToday();
 class LocalStorage {
   // create plants in localStorage
   static insertPlants() {
-    gardenStorage.forEach(function (plant, plantId) {
-      localStorage.setItem(plant.plantId, JSON.stringify(plant));
+    state.gardenStorage.forEach(function (plant, plantName) {
+      localStorage.setItem(plant.plantName, JSON.stringify(plant));
     });
   }
 
   // retrieve plants from localStorage
   static getPlants() {
-    gardenStorage = [];
+    state.gardenStorage = [];
     for (let i = 0; i < localStorage.length; i++) {
-      gardenStorage.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+      state.gardenStorage.push(
+        JSON.parse(localStorage.getItem(localStorage.key(i)))
+      );
     }
-    console.log(gardenStorage);
+    console.log(state.gardenStorage);
   }
 
   // remove plants from localStorage
