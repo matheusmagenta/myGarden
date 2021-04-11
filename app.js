@@ -28,6 +28,7 @@ let plantNameInput = document.querySelector("#plant-name");
 let plantSowDateInput = document.querySelector("#plant-sow-date");
 let plantHarvestDateInput = document.querySelector("#plant-harvest-date");
 const weatherToday = document.querySelector(".weather-today");
+const weatherForecast = document.querySelector(".weather-forecast");
 
 // functions
 // adding plant to storage
@@ -93,41 +94,6 @@ window.addEventListener("click", function (e) {
   }
 });
 
-// api consuming
-const API_URL = "";
-const apiKey = "78afda9384a67b825b39c29a9197ecac";
-
-const loadWeatherForecast = async function () {
-  let response = await fetch(
-    `https://api.openweathermap.org/data/2.5/forecast?q=London&units=metric&appid=${apiKey}`
-  );
-  let dataResults = await response.json();
-
-  const dataResultsMidday = dataResults.list.filter((result) => {
-    result = result.dt_txt.includes("12:00:00");
-    return result;
-  });
-  //console.log(dataResultsMidday);
-  dataResultsMidday.forEach((result) => {
-    /* console.log(
-      `on ${result.dt_txt}, the temperature will be ${result.main.temp}ºC and ${result.weather[0].description}`
-    ); */
-  });
-};
-loadWeatherForecast();
-
-const loadWeatherToday = async function () {
-  let response = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=London&units=metric&appid=${apiKey}`
-  );
-  let dataResult = await response.json();
-  //console.log(dataResult);
-  weatherToday.innerText = `today ${Math.round(dataResult.main.temp)}ºC ${
-    dataResult.weather[0].main
-  }`;
-};
-loadWeatherToday();
-
 // localStorage CRUD
 class LocalStorage {
   // create plants in localStorage
@@ -158,3 +124,44 @@ class LocalStorage {
     localStorage.setItem(id, JSON.stringify(plant));
   }
 }
+
+// api consuming WEATHER
+const API_URL = "";
+const apiKey = "78afda9384a67b825b39c29a9197ecac";
+
+const loadWeatherForecast = async function () {
+  let response = await fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?q=London&units=metric&appid=${apiKey}`
+  );
+  let dataResults = await response.json();
+
+  const dataResultsMidday = dataResults.list.filter((result) => {
+    result = result.dt_txt.includes("12:00:00");
+    return result;
+  });
+  //console.log(dataResultsMidday);
+  weatherForecast.innerHTML = "<span>next days</span> ";
+  // removing today
+  dataResultsMidday.shift();
+  dataResultsMidday.forEach((result) => {
+    let temp = `${Math.round(result.main.temp)}ºC`;
+    let icon = `<img class="weather-icon" src="http://openweathermap.org/img/wn/${result.weather[0].icon}.png"></img>`;
+
+    weatherForecast.insertAdjacentHTML("beforeend", icon);
+  });
+};
+loadWeatherForecast();
+
+const loadWeatherToday = async function () {
+  let response = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=London&units=metric&appid=${apiKey}`
+  );
+  let dataResult = await response.json();
+  //console.log(dataResult);
+  let icon = `<img class="weather-icon" src="http://openweathermap.org/img/wn/${dataResult.weather[0].icon}@2x.png"></img>`;
+
+  weatherToday.innerHTML = `${icon} ${Math.round(dataResult.main.temp)}ºC`;
+
+  // adding icon
+};
+loadWeatherToday();

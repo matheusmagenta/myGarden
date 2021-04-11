@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  margin-top: 100px;
+  margin-top: 65px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,10 +21,10 @@ body {
 }
 
 .plant {
-  border-radius: 10px;
+  border-radius: 5px;
   margin: 10px;
   padding: 10px;
-  background: #627955;
+  background: white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,6 +34,36 @@ body {
 .weather {
   margin-top: 10px;
   margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.weather-today {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+button {
+  background-color: #a8a97d;
+  border-width: 0px;
+}
+
+.weather-forecast {
+  height: 60px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+span {
+  transform: translate(-7px, 14px);
+  font-size: 10px;
+  opacity: 60%;
+}
+
+.weather-icon {
+  margin-bottom: -20px;
 }
 
 .far {
@@ -42,4 +72,37 @@ body {
 
 li {
   margin-right: 20px;
+}
+
+.form-plant {
+  display: inline-block;
+}
+
+/* ACCESSIBILITY */
+label {
+  cursor: pointer;
+  font-size: 15px;
+}
+
+input {
+  border-color: white;
+  margin-bottom: 10px;
+}
+
+input[type="text"]:hover {
+  border-color: darkblue;
+  border-width: 2px;
+}
+
+input[type="date"]:hover {
+  border-color: darkblue;
+  border-width: 2px;
+}
+
+label:focus-within {
+  color: blue;
+}
+
+input[type="text"]:focus {
+  border: 2px solid darkgreen;
 }
