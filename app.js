@@ -53,18 +53,6 @@ const renderPlant = function (plant) {
 // adding plant to storage
 const addPlant = function (e) {
   e.preventDefault();
-  const plantDiv = document.createElement("div");
-  plantDiv.classList.add("plant");
-  plantDiv.id = `${plantNameInput.value}`;
-  plantDiv.innerHTML = `<p class="plant-name-input">${plantNameInput.value}</p>
-  <p class="plant-sow-input">Sow Date: ${plantSowDateInput.value}</p>
-  <p class="plant-harvest-input">Harvest Date: ${plantHarvestDateInput.value}</p>
-  <div class="buttons-plant>
-  <button class="watered-plant">watered today?</button>
-  <i class="far fa-edit edit-plant"></i><i class="far fa-trash-alt remove-plant"></i>
-  </div>
-  `;
-  plants.appendChild(plantDiv);
 
   state.currentPlant = new Plant(
     plantNameInput.value,
@@ -72,8 +60,10 @@ const addPlant = function (e) {
     plantHarvestDateInput.value
   );
 
+  renderPlant(state.currentPlant);
+
   state.gardenStorage.push(state.currentPlant);
-  console.log("state: ", state);
+  //console.log("state: ", state);
 
   // adding plants to localStorage
   LocalStorage.insertPlants();
@@ -97,37 +87,12 @@ const editPlant = function (currentPlant) {
   plantHarvestDateInput.value = currentPlant.harvestDate;
 };
 
+// clearing the form
 const clearForm = function () {
   plantNameInput.value = "";
   plantSowDateInput.value = "";
   plantHarvestDateInput.value = "";
 };
-
-// event listeners
-// adding plant to UI and localStorage
-addButton.addEventListener("click", addPlant);
-
-// removing plant from UI, state and localStorage
-window.addEventListener("click", function (e) {
-  if (e.target.classList.contains("remove-plant")) {
-    // removing from UI
-    removePlantFromUI(e.target.parentElement.parentElement);
-
-    // removing from localStorage
-    LocalStorage.removePlantFromStorage(
-      e.target.parentElement.parentElement.id
-    );
-
-    // removing from state
-    //state.gardenStorage.
-    state.gardenStorage.forEach((plant, index) => {
-      if (plant.plantName == e.target.parentElement.parentElement.id) {
-        state.gardenStorage.splice(index, 1);
-      }
-    });
-    console.log("state.gardenStorage after removing:", state.gardenStorage);
-  }
-});
 
 //get plant
 function getPlant(id) {
@@ -135,25 +100,46 @@ function getPlant(id) {
   // console.log("state.currentPlant", state.currentPlant);
 }
 
+function removePlant(plantToBeRemoved) {
+  // removing from UI
+  removePlantFromUI(plantToBeRemoved);
+
+  // removing from localStorage
+  LocalStorage.removePlantFromStorage(plantToBeRemoved.id);
+
+  // removing from state
+  //state.gardenStorage.
+  state.gardenStorage.forEach((plant, index) => {
+    if (plant.plantName == plantToBeRemoved.id) {
+      state.gardenStorage.splice(index, 1);
+    }
+  });
+  //console.log("state.gardenStorage after removing:", state.gardenStorage);
+}
+
+// EVENT LISTENERS
+// adding plant to UI and localStorage
+addButton.addEventListener("click", addPlant);
+
+// removing plant from UI, state and localStorage
+window.addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove-plant")) {
+    const plantToBeRemoved = e.target.parentElement.parentElement;
+    removePlant(plantToBeRemoved);
+  }
+});
+
 // editing plant
 window.addEventListener("click", function (e) {
   if (e.target.classList.contains("edit-plant")) {
-    console.log(e.target.parentElement.parentElement.id);
+    const plantToBeEdited = e.target.parentElement.parentElement;
+    console.log(plantToBeEdited.id);
     // get plant targeted and put it at state.currentPlant
-    state.currentPlant = getPlant(e.target.parentElement.parentElement.id);
+    state.currentPlant = getPlant(plantToBeEdited.id);
     // fill form with currentPlant info
     editPlant(state.currentPlant[0]);
-    // TODO: REFACTOR REMOVING TO AVOID DUPLICATED CODE
     // remove plant from render, localStorage and state
-    removePlantFromUI(e.target.parentElement.parentElement);
-    LocalStorage.removePlantFromStorage(
-      e.target.parentElement.parentElement.id
-    );
-    state.gardenStorage.forEach((plant, index) => {
-      if (plant.plantName == e.target.parentElement.parentElement.id) {
-        state.gardenStorage.splice(index, 1);
-      }
-    });
+    removePlant(plantToBeEdited);
     // change button name
     addButton.innerHTML = "<i class='fas fa-plus'></i> update plant";
   }
@@ -189,7 +175,7 @@ class LocalStorage {
         JSON.parse(localStorage.getItem(localStorage.key(i)))
       );
     }
-    console.log(state.gardenStorage);
+    //console.log(state.gardenStorage);
   }
 
   // remove plants from localStorage
