@@ -6,7 +6,8 @@
 
 body {
   font-family: "Sawarabi Mincho", sans-serif;
-  background: linear-gradient(#cfd1a5, #a8a97d);
+
+  background: #cfd1a5;
   background-repeat: no-repeat;
   height: 768px;
 }
@@ -44,8 +45,14 @@ body {
 }
 
 button {
-  background-color: #a8a97d;
+  background-color: Transparent;
   border-width: 0px;
+  color: black;
+}
+
+button:hover {
+  background-color: black;
+  color: #cfd1a5;
 }
 
 .weather-forecast {
@@ -105,4 +112,13 @@ label:focus-within {
 
 input[type="text"]:focus {
   border: 2px solid darkgreen;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.far {
+  margin: 10px;
 }

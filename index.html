@@ -53,18 +53,32 @@
         <div class="weather-today"></div>
         <div class="weather-forecast"></div>
       </div>
-      <form class="form-plant">
-        <label for="plant-name">Plant</label>
-        <input type="text" name="plant-name" id="plant-name" autofocus /><br />
-        <label for="plant-sow-date">Sow</label>
+      <form class="form-plant" method="post">
+        <label for="plant-name">plant</label>
+        <input
+          type="text"
+          name="plant-name"
+          id="plant-name"
+          pattern="[A-Za-z\d\.]{4,10}"
+          autofocus
+          required
+        /><br />
+        <label for="plant-sow-date">sow</label>
         <input type="date" name="plant-sow-date" id="plant-sow-date" /><br />
-        <label for="plant-harvest-date">Harvest</label>
+        <label for="plant-harvest-date">harvest</label>
         <input
           type="date"
           name="plant-harvest-date"
           id="plant-harvest-date"
         /><br />
-        <button class="form-submit" type="submit">add</button>
+        <div class="buttons">
+          <button class="form-submit" type="submit">
+            <i class="fas fa-plus"></i> add plant
+          </button>
+          <button class="button" type="reset">
+            <i class="fas fa-times"></i> reset
+          </button>
+        </div>
       </form>
       <div class="plants">
         <!--  <div class="plant">

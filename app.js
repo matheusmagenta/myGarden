@@ -37,11 +37,13 @@ const addPlant = function (e) {
   const plant = document.createElement("div");
   plant.classList.add("plant");
   plant.id = `${plantNameInput.value}`;
-  plant.innerHTML = `<p>${plantNameInput.value}</p>
-  <p>Sow Date: ${plantSowDateInput.value}</p>
-  <p>Harvest Date: ${plantHarvestDateInput.value}</p>
+  plant.innerHTML = `<p class="plant-name-input">${plantNameInput.value}</p>
+  <p class="plant-sow-input">Sow Date: ${plantSowDateInput.value}</p>
+  <p class="plant-harvest-input">Harvest Date: ${plantHarvestDateInput.value}</p>
+  <div class="buttons-plant>
   <button class="watered-plant">watered today?</button>
   <i class="far fa-edit edit-plant"></i><i class="far fa-trash-alt remove-plant"></i>
+  </div>
   `;
   plants.appendChild(plant);
 
@@ -52,22 +54,34 @@ const addPlant = function (e) {
   );
 
   state.gardenStorage.push(state.currentPlant);
-  //console.log("state.gardenStorage: ", state.gardenStorage);
   console.log("state: ", state);
-  // console.log("plantTest: ", plantTest);
 
   // adding plants to localStorage
   LocalStorage.insertPlants();
 
-  // TODO: create a function for this funcionality
-  // cleaning form fields
+  // clearing form fields
+  clearForm();
+
+  //updating button text
+  addButton.innerHTML = "<i class='fas fa-plus'></i> add plant";
+};
+
+// removing plant
+const removePlant = function (element) {
+  plants.removeChild(element);
+};
+
+// editing plant
+const editPlant = function (currentPlant) {
+  plantNameInput.value = currentPlant.plantName;
+  plantSowDateInput.value = currentPlant.sowDay;
+  plantHarvestDateInput.value = currentPlant.harvestDay;
+};
+
+const clearForm = function () {
   plantNameInput.value = "";
   plantSowDateInput.value = "";
   plantHarvestDateInput.value = "";
-};
-
-const removePlant = function (element) {
-  plants.removeChild(element);
 };
 
 // event listeners
@@ -78,19 +92,40 @@ addButton.addEventListener("click", addPlant);
 window.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove-plant")) {
     // removing from UI
-    removePlant(e.target.parentElement);
+    removePlant(e.target.parentElement.parentElement);
 
     // removing from localStorage
-    LocalStorage.removePlants(e.target.parentElement.id);
+    LocalStorage.removePlants(e.target.parentElement.parentElement.id);
 
     // removing from state
     //state.gardenStorage.
     state.gardenStorage.forEach((plant, index) => {
-      if (plant.plantName == e.target.parentElement.id) {
+      if (plant.plantName == e.target.parentElement.parentElement.id) {
         state.gardenStorage.splice(index, 1);
       }
     });
     console.log("state.gardenStorage after removing:", state.gardenStorage);
+  }
+});
+
+//get plant
+function getPlant(id) {
+  return state.gardenStorage.filter((plant) => plant.plantName === id);
+  // console.log("state.currentPlant", state.currentPlant);
+}
+
+// editing plant
+window.addEventListener("click", function (e) {
+  if (e.target.classList.contains("edit-plant")) {
+    console.log(e.target.parentElement.parentElement.id);
+    // get plant targeted and put it at state.currentPlant
+    state.currentPlant = getPlant(e.target.parentElement.parentElement.id);
+    // fill form with currentPlant info
+    editPlant(state.currentPlant[0]);
+    // hide plant render
+    removePlant(e.target.parentElement.parentElement);
+    // change button name
+    addButton.innerHTML = "<i class='fas fa-plus'></i> update plant";
   }
 });
 
@@ -120,7 +155,7 @@ class LocalStorage {
   }
 
   // update plants from localStorage
-  static changePlants(plant, id) {
+  static editPlants(plant, id) {
     localStorage.setItem(id, JSON.stringify(plant));
   }
 }
