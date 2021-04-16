@@ -23,18 +23,20 @@ const state = {
 
 // selecting elements
 const addButton = document.querySelector(".form-submit");
+const hideButton = document.querySelector(".hide-button");
 const plants = document.querySelector(".plants");
 let plantNameInput = document.querySelector("#plant-name");
 let plantSowDateInput = document.querySelector("#plant-sow-date");
 let plantHarvestDateInput = document.querySelector("#plant-harvest-date");
+const plantForm = document.querySelector(".form-plant");
 const weatherToday = document.querySelector(".weather-today");
 const weatherForecast = document.querySelector(".weather-forecast");
-const myPlantsButton = document.querySelector(".nav-myplants");
+const myPlantsNavButton = document.querySelector(".nav-add-plant");
+const addPlantNavButton = document.querySelector(".nav-myplants");
 
 // functions
 
 // render plant
-
 const renderPlant = function (plant) {
   const plantDiv = document.createElement("div");
   plantDiv.classList.add("plant");
@@ -59,20 +61,24 @@ const addPlant = function (e) {
     plantSowDateInput.value,
     plantHarvestDateInput.value
   );
+  if (checkPlant(state.currentPlant.plantName)) {
+    alert("plant with this name already exist");
+  }
 
-  renderPlant(state.currentPlant);
+  if (!checkPlant(state.currentPlant.plantName)) {
+    renderPlant(state.currentPlant);
 
-  state.gardenStorage.push(state.currentPlant);
-  //console.log("state: ", state);
+    state.gardenStorage.push(state.currentPlant);
 
-  // adding plants to localStorage
-  LocalStorage.insertPlants();
+    // adding plants to localStorage
+    LocalStorage.insertPlants();
 
-  // clearing form fields
-  clearForm();
+    // clearing form fields
+    clearForm();
 
-  //updating button text
-  addButton.innerHTML = "<i class='fas fa-plus'></i> add plant";
+    //updating button text
+    addButton.innerHTML = "<i class='fas fa-plus'></i> add plant";
+  }
 };
 
 // removing plant
@@ -92,6 +98,17 @@ const clearForm = function () {
   plantNameInput.value = "";
   plantSowDateInput.value = "";
   plantHarvestDateInput.value = "";
+};
+
+// checking if plant exists in storage
+const checkPlant = function (id) {
+  if (state.gardenStorage.find((plant) => plant.plantName === id)) {
+    console.log("plant already exist");
+    return true;
+  } else {
+    console.log("new plant");
+    return false;
+  }
 };
 
 //get plant
@@ -143,19 +160,6 @@ window.addEventListener("click", function (e) {
     // change button name
     addButton.innerHTML = "<i class='fas fa-plus'></i> update plant";
   }
-});
-
-// show my plants
-myPlantsButton.addEventListener("click", function (e) {
-  e.preventDefault();
-  // get plants from localStorage
-  LocalStorage.getPlants();
-  // hide addplant form
-
-  // render plants
-  state.gardenStorage.map((plant) => {
-    renderPlant(plant);
-  });
 });
 
 // localStorage CRUD

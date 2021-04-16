@@ -85,6 +85,10 @@ li {
   display: inline-block;
 }
 
+.hidden {
+  display: none;
+}
+
 /* ACCESSIBILITY */
 label {
   cursor: pointer;
